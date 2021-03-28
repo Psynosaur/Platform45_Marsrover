@@ -55,12 +55,37 @@ namespace Platform45_MarsRover
             return x >= 0 && x < _lenX && y >= 0 && y < _lenY;
         }
 
-        private static bool CheckRoverMoveForCollision(int x, int y, IEnumerable<Rover> rovers)
+        private static bool CheckRoverMoveForCollision(int x, int y)
         {
-            var checkCollision = rovers.Any(o => o.X == x && o.Y == y);
+            var checkCollision = ParkedRovers.Any(o => o.X == x && o.Y == y);
             return checkCollision;
         }
+        // Collision and bounds check in same function :)
+        private static bool CheckRoverMove(Rover r, int x, int y, int[,] plateau)
+        {
+            if (CheckRoverInitOrMovePosition(x, y))
+            {
+                if (CheckRoverMoveForCollision(x, y))
+                {
+                    r.Errors++;
+                    var collider = ParkedRovers.FirstOrDefault(o => o.X == x && o.Y == y);
+                    if (collider != null)
+                        Console.WriteLine(
+                            $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{GetCardinalHeading(r.H)}' move command");
+                    return false;
+                }
 
+                // Claim the discovery for this coordinates
+                if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
+                return true;
+            }
+
+            r.Errors++;
+            Console.WriteLine(
+                $"[ERROR] : Moving rover {r.Number} at x: {r.X} y: {r.Y} with heading '{GetCardinalHeading(r.H)}' would place " +
+                $"it out of bounds!!!  skipping '{GetCardinalHeading(r.H)}' move command");
+            return false;
+        }
 
         // Set the number at coordinate in the plateau to the rover number that explored it first
         private static void MoveRover(Rover r, int heading, int[,] plateau)
@@ -71,116 +96,16 @@ namespace Platform45_MarsRover
             switch (heading)
             {
                 case 0:
-                    if (CheckRoverInitOrMovePosition(r.X, r.Y + 1))
-                    {
-                        if (CheckRoverMoveForCollision(r.X, r.Y + 1, ParkedRovers))
-                        {
-                            r.Errors++;
-                            var collider = ParkedRovers.FirstOrDefault(o => o.X == r.X && o.Y == r.Y + 1);
-                            if (collider != null)
-                                Console.WriteLine(
-                                    $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{GetCardinalHeading(r.H)}' move command");
-                        }
-                        else
-                        {
-                            r.Y += 1;
-                        }
-
-                        // Claim the discovery for this coordinates
-                        if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
-                    }
-                    else
-                    {
-                        r.Errors++;
-                        Console.WriteLine(
-                            $"[ERROR] : Moving rover {r.Number} at x: {r.X} y: {r.Y} with heading '{GetCardinalHeading(r.H)}' would place " +
-                            $"it out of bounds!!!  skipping '{GetCardinalHeading(r.H)}' move command");
-                    }
-
+                    if (CheckRoverMove(r, r.X, r.Y + 1, plateau)) r.Y += 1;
                     break;
                 case 90:
-                    if (CheckRoverInitOrMovePosition(r.X + 1, r.Y))
-                    {
-                        if (CheckRoverMoveForCollision(r.X + 1, r.Y, ParkedRovers))
-                        {
-                            r.Errors++;
-                            var collider = ParkedRovers.FirstOrDefault(o => o.X == r.X + 1 && o.Y == r.Y);
-                            if (collider != null)
-                                Console.WriteLine(
-                                    $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{GetCardinalHeading(r.H)}' move command");
-                        }
-                        else
-                        {
-                            r.X += 1;
-                        }
-
-                        // Claim the discovery for this coordinates
-                        if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
-                    }
-                    else
-                    {
-                        r.Errors++;
-                        Console.WriteLine(
-                            $"[ERROR] : Moving rover {r.Number} at x: {r.X} y: {r.Y} with heading '{GetCardinalHeading(r.H)}' would place " +
-                            $"it out of bounds!!!  skipping '{GetCardinalHeading(r.H)}' move command");
-                    }
-
+                    if (CheckRoverMove(r, r.X + 1, r.Y, plateau)) r.X += 1;
                     break;
                 case 180:
-                    if (CheckRoverInitOrMovePosition(r.X, r.Y - 1))
-                    {
-                        if (CheckRoverMoveForCollision(r.X, r.Y - 1, ParkedRovers))
-                        {
-                            r.Errors++;
-                            var collider = ParkedRovers.FirstOrDefault(o => o.X == r.X && o.Y == r.Y - 1);
-                            if (collider != null)
-                                Console.WriteLine(
-                                    $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{GetCardinalHeading(r.H)}' move command");
-                        }
-                        else
-                        {
-                            r.Y -= 1;
-                        }
-
-                        // Claim the discovery for this coordinates
-                        if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
-                    }
-                    else
-                    {
-                        r.Errors++;
-                        Console.WriteLine(
-                            $"[ERROR] : Moving rover {r.Number} at x: {r.X} y: {r.Y} with heading '{GetCardinalHeading(r.H)}' would place " +
-                            $"it out of bounds!!!  skipping '{GetCardinalHeading(r.H)}' move command");
-                    }
-
+                    if (CheckRoverMove(r, r.X, r.Y - 1, plateau)) r.Y -= 1;
                     break;
                 case 270:
-                    if (CheckRoverInitOrMovePosition(r.X - 1, r.Y))
-                    {
-                        if (CheckRoverMoveForCollision(r.X - 1, r.Y, ParkedRovers))
-                        {
-                            r.Errors++;
-                            var collider = ParkedRovers.FirstOrDefault(o => o.X == r.X - 1 && o.Y == r.Y);
-                            if (collider != null)
-                                Console.WriteLine(
-                                    $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{GetCardinalHeading(r.H)}' move command");
-                        }
-                        else
-                        {
-                            r.X -= 1;
-                        }
-
-                        // Claim the discovery for this coordinates
-                        if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
-                    }
-                    else
-                    {
-                        r.Errors++;
-                        Console.WriteLine(
-                            $"[ERROR] : Moving rover {r.Number} at x: {r.X} y: {r.Y} with heading '{GetCardinalHeading(r.H)}' would place " +
-                            $"it out of bounds!!!  skipping '{GetCardinalHeading(r.H)}' move command");
-                    }
-
+                    if (CheckRoverMove(r, r.X - 1, r.Y, plateau)) r.X -= 1;
                     break;
             }
         }
@@ -251,6 +176,25 @@ namespace Platform45_MarsRover
                             plateau[rover.X, rover.Y] = i;
                             Console.WriteLine($"\nDeploying rover {i} on validated coordinates" +
                                               $" {rover.X} {rover.Y} {GetCardinalHeading(rover.H)} ");
+                            // after removing the rover init line from the cmdList 'stack', we have the "do stuff" line
+                            // for this initialized rover
+                            var doStuffCommandLine = cmdList.FirstOrDefault()?.ToCharArray();
+                            if (doStuffCommandLine != null)
+                            {
+                                rover.CmdCount = doStuffCommandLine.Length;
+                                rover.Number = i;
+                                foreach (var c in doStuffCommandLine)
+                                    if (c == 'L' || c == 'R')
+                                        TurnRover(rover, c);
+                                    else MoveRover(rover, rover.H, plateau);
+                            }
+
+                            // remove the commandLine from the cmdList 'stack' since we've used it
+                            cmdList = cmdList.Skip(1).ToList();
+                            Console.WriteLine($"The state of the plateau after rover {i} finished its commands\n");
+
+                            // Use this for collision detection
+                            ParkedRovers.Add(rover);
                         }
                         else
                         {
@@ -260,26 +204,6 @@ namespace Platform45_MarsRover
                             // and move on to the next rover without doing stuff
                             continue;
                         }
-
-                        // after removing the rover init line from the cmdList 'stack', we have the "do stuff" line
-                        // for this initialized rover
-                        var doStuffCommandLine = cmdList.FirstOrDefault()?.ToCharArray();
-                        if (doStuffCommandLine != null)
-                        {
-                            rover.CmdCount = doStuffCommandLine.Length;
-                            rover.Number = i;
-                            foreach (var c in doStuffCommandLine)
-                                if (c == 'L' || c == 'R')
-                                    TurnRover(rover, c);
-                                else MoveRover(rover, rover.H, plateau);
-                        }
-
-                        // remove the commandLine from the cmdList 'stack' since we've used it
-                        cmdList = cmdList.Skip(1).ToList();
-                        Console.WriteLine($"The state of the plateau after rover {i} finished its commands\n");
-
-                        // Use this for collision detection
-                        ParkedRovers.Add(rover);
                     }
 
                     // Print the rovers progress
