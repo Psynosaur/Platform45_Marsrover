@@ -2,6 +2,7 @@
 
 ### These are my observations and notes, they are not in any particulare order, however the code is structured in such a way that these observations make more sense.
 
+### Built using .Net Core 3.1 CLI application template from Visual Studio 2019
 
 These are my assumptions and notes on the problem which I will turn into code.
 - This plateau, which is curiously rectangular, must be navigated by the rovers so that their on board cameras can get a complete view of the surrounding terrain to send back to Earth.
