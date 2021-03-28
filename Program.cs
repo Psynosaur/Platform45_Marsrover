@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Plafrorm45_MarsRover
+namespace Platform45_MarsRover
 {
     internal class Program
     {
