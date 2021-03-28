@@ -54,13 +54,13 @@ The output for each rover should be its final co-ordinates and heading.
 #### Plateau size is a 6x6 matrix given the start coordinates of 0,0
 - 5 5
   
-####Rover 1 - Message
+#### Rover 1 - Message
 - Position / start - Line 1
     - 1 2 N
 - Instruction - Line 2
     - LMLMLMLMM
       
-####Rover 2 - Message
+#### Rover 2 - Message
 - Position / start - Line 1
     - 3 3 E
 - Instruction - Line 2
@@ -72,14 +72,14 @@ The output for each rover should be its final co-ordinates and heading.
 
 5 1 E
 
-####Create function for cardinal directions: 
+#### Create function for cardinal directions: 
 
     N = 0° / 360°
     E = 90°
     S = 180°
     W = 270°
 
-####Define a rover state: I never used this :D
+#### Define a rover state: I never used this :D
 
     setState(rover)
         // state object, only changes one attribute at a time
@@ -89,7 +89,7 @@ The output for each rover should be its final co-ordinates and heading.
                h : rover.h
         }
 
-####Define turning as a function:
+#### Define turning as a function:
         
         // NOTE --> 360° = 0° 
         turnRover(h, turn):
@@ -103,7 +103,7 @@ The output for each rover should be its final co-ordinates and heading.
                 if h == 0:
                     h = 360
                 h = h - 90
-####Define moving as a function: 
+#### Define moving as a function: 
         
         moveRover(currentX, currentY, h):
             // integer array for our coordinates
