@@ -76,6 +76,8 @@ namespace Platform45_MarsRover
                     return false;
                 }
 
+                // Claim the discovery for this coordinates
+                if (plateau[x, y] == 0) plateau[x, y] = r.Number;
                 return true;
             }
 
@@ -96,20 +98,15 @@ namespace Platform45_MarsRover
             {
                 case 0:
                     if (CheckRoverMove(r, r.X, r.Y + 1, plateau)) r.Y++;
-                    // Claim the discovery for this coordinates
-                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
                 case 90:
                     if (CheckRoverMove(r, r.X + 1, r.Y, plateau)) r.X++;
-                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
                 case 180:
                     if (CheckRoverMove(r, r.X, r.Y - 1, plateau)) r.Y--;
-                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
                 case 270:
                     if (CheckRoverMove(r, r.X - 1, r.Y, plateau)) r.X--;
-                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
             }
         }
