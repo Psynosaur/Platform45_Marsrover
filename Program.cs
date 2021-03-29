@@ -6,8 +6,7 @@ namespace Platform45_MarsRover
 {
     internal class Program
     {
-        private static readonly string TestMessage =
-            "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM\n0 0 E\nMLMMMMRMRMMLMM\n5 5 W\nMMMMMLMLMMMMMMMRMRMMMMMM";
+        private const string TestMessage = "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM\n0 0 E\nMLMMMMRMRMMLMM\n5 5 W\nMMMMMLMLMMMMMMMRMRMMMMMM";
 
         // Our grid/plateau dimensions
         private static int _lenX;
@@ -96,16 +95,16 @@ namespace Platform45_MarsRover
             switch (heading)
             {
                 case 0:
-                    if (CheckRoverMove(r, r.X, r.Y + 1, plateau)) r.Y += 1;
+                    if (CheckRoverMove(r, r.X, r.Y + 1, plateau)) r.Y++;
                     break;
                 case 90:
-                    if (CheckRoverMove(r, r.X + 1, r.Y, plateau)) r.X += 1;
+                    if (CheckRoverMove(r, r.X + 1, r.Y, plateau)) r.X++;
                     break;
                 case 180:
-                    if (CheckRoverMove(r, r.X, r.Y - 1, plateau)) r.Y -= 1;
+                    if (CheckRoverMove(r, r.X, r.Y - 1, plateau)) r.Y--;
                     break;
                 case 270:
-                    if (CheckRoverMove(r, r.X - 1, r.Y, plateau)) r.X -= 1;
+                    if (CheckRoverMove(r, r.X - 1, r.Y, plateau)) r.X--;
                     break;
             }
         }
@@ -134,8 +133,7 @@ namespace Platform45_MarsRover
                 var cmdList = TestMessage.Split('\n').ToList();
 
                 // line one of the cmdList 'stack' is the upper coordinates of our plateau
-                string[] upperCoords;
-                upperCoords = cmdList.FirstOrDefault()?.Split(' ');
+                var upperCoords = cmdList.FirstOrDefault()?.Split(' ');
 
                 // remove line one of the cmdList 'stack' since we've used it values
                 cmdList = cmdList.Skip(1).ToList();
@@ -168,10 +166,9 @@ namespace Platform45_MarsRover
                         var initX = Convert.ToInt32(initCommandLine[0]);
                         var initY = Convert.ToInt32(initCommandLine[1]);
                         var heading = GetHeadingDegrees(initCommandLine[2]);
-                        Rover rover;
                         if (CheckRoverInitOrMovePosition(initX, initY))
                         {
-                            rover = new Rover(initX, initY, heading);
+                            var rover = new Rover(initX, initY, heading);
                             // set the start position as explored too
                             plateau[rover.X, rover.Y] = i;
                             Console.WriteLine($"\nDeploying rover {i} on validated coordinates" +
@@ -207,9 +204,9 @@ namespace Platform45_MarsRover
                     }
 
                     // Print the rovers progress
-                    for (var x = plateau.GetLength(1) - 1; x >= 0; x--)
+                    for (var y = plateau.GetLength(1) - 1; y >= 0; y--)
                     {
-                        for (var y = 0; y < plateau.GetLength(0); y++) Console.Write(plateau[y, x] + " ");
+                        for (var x = 0; x < plateau.GetLength(0); x++) Console.Write(plateau[x, y] + " ");
                         Console.WriteLine();
                     }
                 }
