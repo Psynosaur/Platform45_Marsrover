@@ -6,7 +6,8 @@ namespace Platform45_MarsRover
 {
     internal class Program
     {
-        private const string TestMessage = "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM\n0 0 E\nMLMMMMRMRMMLMM\n5 5 W\nMMMMMLMLMMMMMMMRMRMMMMMM";
+        private const string TestMessage =
+            "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM\n0 0 E\nMLMMMMRMRMMLMM\n5 5 W\nMMMMMLMLMMMMMMMRMRMMMMMM";
 
         // Our grid/plateau dimensions
         private static int _lenX;
@@ -59,6 +60,7 @@ namespace Platform45_MarsRover
             var checkCollision = ParkedRovers.Any(o => o.X == x && o.Y == y);
             return checkCollision;
         }
+
         // Collision and bounds check in same function :)
         private static bool CheckRoverMove(Rover r, int x, int y, int[,] plateau)
         {
@@ -74,8 +76,6 @@ namespace Platform45_MarsRover
                     return false;
                 }
 
-                // Claim the discovery for this coordinates
-                if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                 return true;
             }
 
@@ -96,15 +96,20 @@ namespace Platform45_MarsRover
             {
                 case 0:
                     if (CheckRoverMove(r, r.X, r.Y + 1, plateau)) r.Y++;
+                    // Claim the discovery for this coordinates
+                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
                 case 90:
                     if (CheckRoverMove(r, r.X + 1, r.Y, plateau)) r.X++;
+                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
                 case 180:
                     if (CheckRoverMove(r, r.X, r.Y - 1, plateau)) r.Y--;
+                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
                 case 270:
                     if (CheckRoverMove(r, r.X - 1, r.Y, plateau)) r.X--;
+                    if (plateau[r.X, r.Y] == 0) plateau[r.X, r.Y] = r.Number;
                     break;
             }
         }
