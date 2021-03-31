@@ -2,7 +2,9 @@
 
 ### These are my observations and notes, they are not in any particulare order, however the code is structured in such a way that these observations make more sense.
 
-### Built using .Net Core 3.1 CLI application template from Visual Studio 2019
+### Built using .Net Core 3.1 CLI application template from JetBrains Rider 2020.3
+
+### For completeness sake : https://code.google.com/archive/p/marsrovertechchallenge/
 
 These are my assumptions and notes on the problem which I will turn into code.
 - This plateau, which is curiously rectangular, must be navigated by the rovers so that their on board cameras can get a complete view of the surrounding terrain to send back to Earth.
@@ -135,7 +137,7 @@ The output for each rover should be its final co-ordinates and heading.
 1. create a loop that executes the following commands per rover for n amounts of rovers
     - Init the rover if the init coordinates are valid
 
-2. create another loop within that splits the byes of the command into separate instructions characters
+2. create another loop within that splits the bytes of the command into separate instructions characters
             
         foreach char in command:
             if char L or R:
