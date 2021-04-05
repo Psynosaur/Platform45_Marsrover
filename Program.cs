@@ -1,149 +1,92 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Platform45_MarsRover
 {
-    internal class Program
+    public class Program
     {
         private const string TestMessage =
-            "5 5\n1 2 N\nLMLMLMLMM\n3 3 E\nMMRMMRMRRM\n0 0 E\nMLMMMMRMRMMLMM\n5 5 W\nMMMMMLMLMMMMMMMRMRMMMMMM";
+            "9 9\n" +
+            "1 2 N\n" +
+            "LMLMLMLMM\n" +
+            "3 3 E\n" +
+            "MMRMMRMRRM\n" +
+            "0 0 E\n" +
+            "MLMMMMLMLMLMLMMRMRMMLMM\n" +
+            "9 9 W\n" +
+            "MMMMMLMLMMMMMLMLMLMLMMMMRMRMMMMMML\n" +
+            "7 7 W\n" +
+            "MLMLMMMMMLMLMLMLMMMMRMRMMMMMMLLL\n" +
+            "6 6 W\n" +
+            "MLMMMMLMLMLMLMMRMRMMLMMLL\n" +
+            "9 0 N\n" +
+            "MMMMLMLMMMMRMRMMMMLMLMMRMRMMLMML";
 
-        // Our grid/plateau dimensions
-        private static int _lenX;
-
-        private static int _lenY;
-
-        // List of parked rovers
-        private static readonly List<Rover> ParkedRovers = new List<Rover>();
-
-        private static int GetHeadingDegrees(string heading)
+        private static List<string> Pop(List<string> cmdList)
         {
-            return heading switch
+            cmdList.RemoveAt(0);
+            return cmdList;
+        }
+
+        private static string PopLine(IReadOnlyList<string> cmdList)
+        {
+            string firstLine = null;
+            for (var i = 0; i < cmdList.Count;)
             {
-                "N" => 0,
-                "E" => 90,
-                "S" => 180,
-                "W" => 270,
-                _ => 0
-            };
-        }
-
-        private static string GetCardinalHeading(int heading)
-        {
-            return heading switch
-            {
-                0 => "N",
-                90 => "E",
-                180 => "S",
-                270 => "W",
-                _ => "N"
-            };
-        }
-
-        private static int[,] InitGrid(int upperRightX, int upperRightY)
-        {
-            // we add one to each coords since they start at 0,0
-            var grid = new int[upperRightX + 1, upperRightY + 1];
-            _lenX = grid.GetLength(0);
-            _lenY = grid.GetLength(1);
-            return grid;
-        }
-
-        private static bool CheckRoverInitOrMovePosition(int x, int y)
-        {
-            return x >= 0 && x < _lenX && y >= 0 && y < _lenY;
-        }
-
-        private static bool CheckRoverMoveForCollision(int x, int y)
-        {
-            var checkCollision = ParkedRovers.Any(o => o.X == x && o.Y == y);
-            return checkCollision;
-        }
-
-        // Collision and bounds check in same function :)
-        private static bool CheckRoverMove(Rover r, int x, int y, int[,] plateau)
-        {
-            if (CheckRoverInitOrMovePosition(x, y))
-            {
-                if (CheckRoverMoveForCollision(x, y))
-                {
-                    r.Errors++;
-                    var collider = ParkedRovers.FirstOrDefault(o => o.X == x && o.Y == y);
-                    if (collider != null)
-                        Console.WriteLine(
-                            $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{GetCardinalHeading(r.H)}' move command");
-                    return false;
-                }
-
-                // Claim the discovery for this coordinates
-                if (plateau[x, y] == 0) plateau[x, y] = r.Number;
-                return true;
+                var s = cmdList[i];
+                firstLine = s;
+                break;
             }
 
-            r.Errors++;
-            Console.WriteLine(
-                $"[ERROR] : Moving rover {r.Number} at x: {r.X} y: {r.Y} with heading '{GetCardinalHeading(r.H)}' would place " +
-                $"it out of bounds!!!  skipping '{GetCardinalHeading(r.H)}' move command");
-            return false;
+            return firstLine;
         }
 
-        // Set the number at coordinate in the plateau to the rover number that explored it first
-        private static void MoveRover(Rover r, int heading, int[,] plateau)
+        private static void PrintPlateau(int[,] plateau)
         {
-            // We can check here that the move would not result in the rover being out of bounds
-            // For all intends and purposes, Im going to discard a move instruction either if it
-            // would result in the rover being out of bounds or it would crash into another rover
-            switch (heading)
+            for (var y = plateau.GetLength(1) - 1; y >= 0; y--)
             {
-                case 0:
-                    if (CheckRoverMove(r, r.X, r.Y + 1, plateau)) r.Y++;
-                    break;
-                case 90:
-                    if (CheckRoverMove(r, r.X + 1, r.Y, plateau)) r.X++;
-                    break;
-                case 180:
-                    if (CheckRoverMove(r, r.X, r.Y - 1, plateau)) r.Y--;
-                    break;
-                case 270:
-                    if (CheckRoverMove(r, r.X - 1, r.Y, plateau)) r.X--;
-                    break;
+                for (var x = 0; x < plateau.GetLength(0); x++) Console.Write(plateau[x, y] + " ");
+                Console.WriteLine();
             }
         }
 
-        private static void TurnRover(Rover r, char turn)
+        // Let NASA know how many pixels are unexplored within our plateau
+        private static int UnexploredPixels(int[,] grid)
         {
-            if (turn == 'R')
+            var cnt = 0;
+            for (var i0 = 0; i0 < grid.GetLength(0); i0++)
+            for (var i1 = 0; i1 < grid.GetLength(1); i1++)
             {
-                r.H += 90;
-                // when h is 360°, we set it to 0° so that we get 90°(E) when adding 90° next time
-                if (r.H == 360) r.H = 0;
+                var num = grid[i0, i1];
+                if (num == 0) cnt++;
             }
-            else
-            {
-                // when h is 0°, we set it to 360° so that we get 270°(W) when subtracting 90°
-                if (r.H == 0) r.H = 360;
-                r.H -= 90;
-            }
+
+            return cnt;
         }
 
-        private static void Main()
+        public static void Main()
         {
+            var direction = new Direction();
+            var plateau = new Plateau();
+            var validator = new CommandValidator(direction, plateau);
             try
             {
                 // split our TestMessage into a 'stack' of strings
-                var cmdList = TestMessage.Split('\n').ToList();
+                var cmdList = new List<string>();
+                foreach (var s in TestMessage.Split('\n')) cmdList.Add(s);
 
                 // line one of the cmdList 'stack' is the upper coordinates of our plateau
-                var upperCoords = cmdList.FirstOrDefault()?.Split(' ');
+                var firstLine = PopLine(cmdList);
+
+                var upperCoords = firstLine?.Split(' ');
 
                 // remove line one of the cmdList 'stack' since we've used it values
-                cmdList = cmdList.Skip(1).ToList();
+                cmdList = Pop(cmdList);
 
                 // setup our plateau / matrix
-                int[,] plateau = { };
+                int[,] grid = { };
                 if (upperCoords != null)
-                    plateau = InitGrid(
+                    grid = plateau.InitGrid(
                         Convert.ToInt32(upperCoords[0]),
                         Convert.ToInt32(upperCoords[1]));
 
@@ -157,71 +100,68 @@ namespace Platform45_MarsRover
                 for (var i = 1; i <= roverCount; i++)
                 {
                     // first line is used to initialize the rover with a starting position
-                    var initCommandLine = cmdList.FirstOrDefault()?.Split(" ");
+                    var initCommandLine = PopLine(cmdList)?.Split(" ");
 
                     // remove the item from cmdList 'stack' since we've used it values
-                    cmdList = cmdList.Skip(1).ToList();
+                    cmdList = Pop(cmdList);
 
                     // Init a rover class
                     if (initCommandLine != null)
                     {
                         var initX = Convert.ToInt32(initCommandLine[0]);
                         var initY = Convert.ToInt32(initCommandLine[1]);
-                        var heading = GetHeadingDegrees(initCommandLine[2]);
-                        if (CheckRoverInitOrMovePosition(initX, initY))
+                        var heading = direction.GetHeadingDegrees(initCommandLine[2]);
+                        if (validator.InitOrMovePosition(initX, initY))
                         {
-                            var rover = new Rover(initX, initY, heading);
+                            var rover = new Rover(initX, initY, heading, validator);
                             // set the start position as explored too
-                            plateau[rover.X, rover.Y] = i;
+                            grid[rover.X, rover.Y] = i;
                             Console.WriteLine($"\nDeploying rover {i} on validated coordinates" +
-                                              $" {rover.X} {rover.Y} {GetCardinalHeading(rover.H)} ");
+                                              $" {rover.X} {rover.Y} {direction.GetCardinalHeading(rover.H)} ");
                             // after removing the rover init line from the cmdList 'stack', we have the "do stuff" line
                             // for this initialized rover
-                            var doStuffCommandLine = cmdList.FirstOrDefault()?.ToCharArray();
+                            var doStuffCommandLine = PopLine(cmdList)?.ToCharArray();
                             if (doStuffCommandLine != null)
                             {
                                 rover.CmdCount = doStuffCommandLine.Length;
                                 rover.Number = i;
                                 foreach (var c in doStuffCommandLine)
                                     if (c == 'L' || c == 'R')
-                                        TurnRover(rover, c);
-                                    else MoveRover(rover, rover.H, plateau);
+                                        rover.Turn(rover, c);
+                                    else
+                                        rover.Move(rover, rover.H, grid);
                             }
 
                             // remove the commandLine from the cmdList 'stack' since we've used it
-                            cmdList = cmdList.Skip(1).ToList();
+                            cmdList = Pop(cmdList);
                             Console.WriteLine($"The state of the plateau after rover {i} finished its commands\n");
 
                             // Use this for collision detection
-                            ParkedRovers.Add(rover);
+                            plateau.ParkedRovers.Add(rover);
                         }
                         else
                         {
                             Console.WriteLine($"Rover {i} out of bounds, trying to deploy the next one");
                             // remove the commandLine from the cmdList 'stack' since we've used it and it was invalid
-                            cmdList = cmdList.Skip(1).ToList();
+                            cmdList = Pop(cmdList);
                             // and move on to the next rover without doing stuff
                             continue;
                         }
                     }
 
                     // Print the rovers progress
-                    for (var y = plateau.GetLength(1) - 1; y >= 0; y--)
-                    {
-                        for (var x = 0; x < plateau.GetLength(0); x++) Console.Write(plateau[x, y] + " ");
-                        Console.WriteLine();
-                    }
+                    PrintPlateau(grid);
                 }
 
-                // Let NASA know how many pixels are unexplored within our plateau
-                var cnt = plateau.Cast<int>().Count(num => num == 0);
+                var cnt = UnexploredPixels(grid);
+
                 Console.WriteLine($"\nUnexplored pixels in our plateau {cnt}");
                 // Summarize rover states, again
                 var index = 1;
-                foreach (var rover in ParkedRovers)
+                foreach (var rover in plateau.ParkedRovers)
                 {
                     Console.WriteLine(
-                        $"\nRover {index} \nOutput: {rover.X} {rover.Y} {GetCardinalHeading(rover.H)}" +
+                        $"\nRover {index} \nOutput: {rover.X} {rover.Y} {direction.GetCardinalHeading(rover.H)}" +
                         $"\nProcessed : {rover.CmdCount} commands with {(rover.Errors > 0 ? $"{rover.Errors} errors" : "no errors")} ");
                     index++;
                 }
@@ -230,23 +170,6 @@ namespace Platform45_MarsRover
             {
                 Console.WriteLine(ex);
             }
-        }
-
-        private class Rover
-        {
-            public Rover(int x, int y, int h)
-            {
-                X = x;
-                Y = y;
-                H = h;
-            }
-
-            public int Number { get; internal set; }
-            public int X { get; internal set; }
-            public int Y { get; internal set; }
-            public int H { get; internal set; }
-            public int CmdCount { get; set; }
-            public int Errors { get; set; }
         }
     }
 }
