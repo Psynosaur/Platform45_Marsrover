@@ -1,4 +1,4 @@
-## Platform45 - Mars Rover challenge
+## Mars Rover challenge
 
 ### These are my observations and notes, they are not in any particulare order, however the code is structured in such a way that these observations make more sense.
 
