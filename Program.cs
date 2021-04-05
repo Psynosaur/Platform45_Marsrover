@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Platform45_MarsRover
+namespace _MarsRover
 {
     public class Program
     {
@@ -28,9 +28,9 @@ namespace Platform45_MarsRover
             return cmdList;
         }
 
-        private static string PopLine(IReadOnlyList<string> cmdList)
+        private static string? PopLine(IReadOnlyList<string> cmdList)
         {
-            string firstLine = null;
+            string? firstLine = null;
             for (var i = 0; i < cmdList.Count;)
             {
                 var s = cmdList[i];

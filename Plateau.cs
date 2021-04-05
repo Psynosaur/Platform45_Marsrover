@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Platform45_MarsRover
+namespace _MarsRover
 {
     public class Plateau
     {

@@ -1,4 +1,4 @@
-namespace Platform45_MarsRover
+namespace _MarsRover
 {
     public class Direction
     {

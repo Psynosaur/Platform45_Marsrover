@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace Platform45_MarsRover
+namespace _MarsRover
 {
     public class CommandValidator
     {
