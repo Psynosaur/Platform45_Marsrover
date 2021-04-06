@@ -66,9 +66,6 @@ namespace _MarsRover
 
         public static void Main()
         {
-            var direction = new Direction();
-            var plateau = new Plateau();
-            var validator = new CommandValidator(direction, plateau);
             try
             {
                 // split our TestMessage into a 'stack' of strings
@@ -84,11 +81,12 @@ namespace _MarsRover
                 cmdList = Pop(cmdList);
 
                 // setup our plateau / matrix
-                int[,] grid = { };
+                var plateau = new Plateau();
                 if (upperCoords != null)
-                    grid = plateau.InitGrid(
-                        Convert.ToInt32(upperCoords[0]),
-                        Convert.ToInt32(upperCoords[1]));
+                    plateau = new Plateau(Convert.ToInt32(upperCoords[0]),
+                            Convert.ToInt32(upperCoords[1]));
+                var direction = new Direction();
+                var validator = new MoveValidator(direction, plateau);        
 
                 // cmdList minus first line(5 5) used for plateau setup divided by 2 lines per rover 
                 // >>> 1st line is rover 'start state'
@@ -115,7 +113,7 @@ namespace _MarsRover
                         {
                             var rover = new Rover(initX, initY, heading, validator);
                             // set the start position as explored too
-                            grid[rover.X, rover.Y] = i;
+                            plateau.Grid[rover.X, rover.Y] = i;
                             Console.WriteLine($"\nDeploying rover {i} on validated coordinates" +
                                               $" {rover.X} {rover.Y} {direction.GetCardinalHeading(rover.H)} ");
                             // after removing the rover init line from the cmdList 'stack', we have the "do stuff" line
@@ -129,7 +127,7 @@ namespace _MarsRover
                                     if (c == 'L' || c == 'R')
                                         rover.Turn(rover, c);
                                     else
-                                        rover.Move(rover, rover.H, grid);
+                                        rover.Move(rover, rover.H, plateau.Grid);
                             }
 
                             // remove the commandLine from the cmdList 'stack' since we've used it
@@ -150,10 +148,10 @@ namespace _MarsRover
                     }
 
                     // Print the rovers progress
-                    PrintPlateau(grid);
+                    PrintPlateau(plateau.Grid);
                 }
 
-                var cnt = UnexploredPixels(grid);
+                var cnt = UnexploredPixels(plateau.Grid);
 
                 Console.WriteLine($"\nUnexplored pixels in our plateau {cnt}");
                 // Summarize rover states, again

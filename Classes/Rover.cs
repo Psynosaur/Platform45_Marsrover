@@ -2,8 +2,8 @@ namespace _MarsRover
 {
     public class Rover
     {
-        private readonly CommandValidator _validator;
-        public Rover(int x, int y, int h, CommandValidator validator)
+        private readonly MoveValidator _validator;
+        public Rover(int x, int y, int h, MoveValidator validator)
         {
             X = x;
             Y = y;

@@ -3,12 +3,12 @@ using System.Linq;
 
 namespace _MarsRover
 {
-    public class CommandValidator
+    public class MoveValidator
     {
         private readonly Direction _direction;
         private readonly Plateau _plateau;
 
-        public CommandValidator(Direction direction, Plateau plateau)
+        public MoveValidator(Direction direction, Plateau plateau)
         {
             _direction = direction;
             _plateau = plateau;
