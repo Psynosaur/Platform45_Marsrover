@@ -35,26 +35,7 @@ namespace _MarsRover.Classes
         {
             if (InitOrMovePosition(x, y))
             {
-                if (RoverCollides(x, y))
-                {
-                    r.Errors++;
-                    Rover? collider = null;
-                    foreach (var o in _plateau.ParkedRovers)
-                    {
-                        if (o.X != x || o.Y != y) continue;
-                        collider = o;
-                        break;
-                    }
-
-                    if (collider != null)
-                        Console.WriteLine(
-                            $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{_direction.GetCardinalHeading(r.H)}' move command");
-                    return false;
-                }
-
-                // Claim the discovery for this coordinates
-                if (plateau[x, y] == 0) plateau[x, y] = r.Number;
-                return true;
+                return CollisionCheck(r, x, y, plateau);
             }
 
             r.Errors++;
@@ -62,6 +43,37 @@ namespace _MarsRover.Classes
                 $"[ERROR] : Moving rover {r.Number} at x: {r.X} y: {r.Y} with heading '{_direction.GetCardinalHeading(r.H)}' would place " +
                 $"it out of bounds!!!  skipping '{_direction.GetCardinalHeading(r.H)}' move command");
             return false;
+        }
+
+        public bool CollisionCheck(Rover r, int x, int y, int[,] plateau)
+        {
+            if (RoverCollides(x, y))
+            {
+                r.Errors++;
+                var rover = Collider(x, y);
+
+                if (rover != null)
+                    Console.WriteLine(
+                        $"[ERROR] : Collision detected with rover {rover.Number}!!! skipping '{_direction.GetCardinalHeading(r.H)}' move command");
+                return false;
+            }
+
+            // Claim the discovery for this coordinates
+            if (plateau[x, y] == 0) plateau[x, y] = r.Number;
+            return true;
+        }
+
+        public Rover? Collider(int x, int y)
+        {
+            Rover? collider = null;
+            foreach (var o in _plateau.ParkedRovers)
+            {
+                if (o.X != x || o.Y != y) continue;
+                collider = o;
+                break;
+            }
+
+            return collider;
         }
     }
 }

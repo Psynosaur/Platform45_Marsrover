@@ -3,6 +3,7 @@ namespace _MarsRover.Classes
     public class Rover
     {
         private readonly MoveValidator _validator;
+
         public Rover(int x, int y, int h, MoveValidator validator)
         {
             X = x;
@@ -17,7 +18,7 @@ namespace _MarsRover.Classes
         public int H { get; internal set; }
         public int CmdCount { get; set; }
         public int Errors { get; set; }
-        
+
         // Set the number at coordinate in the plateau to the rover number that explored it first
 
         public void Move(Rover r, int heading, int[,] plateau)
@@ -49,13 +50,12 @@ namespace _MarsRover.Classes
                 r.H += 90;
                 // when h is 360°, we set it to 0° so that we get 90°(E) when adding 90° next time
                 if (r.H == 360) r.H = 0;
+                return;
             }
-            else
-            {
-                // when h is 0°, we set it to 360° so that we get 270°(W) when subtracting 90°
-                if (r.H == 0) r.H = 360;
-                r.H -= 90;
-            }
+
+            // when h is 0°, we set it to 360° so that we get 270°(W) when subtracting 90°
+            if (r.H == 0) r.H = 360;
+            r.H -= 90;
         }
     }
 }

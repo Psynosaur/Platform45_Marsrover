@@ -21,8 +21,8 @@ namespace _MarsRover
             "6 6 W\n" +
             "MLMMMMLMLMLMLMMRMRMMLMMLL\n" +
             "9 0 N\n" +
-            "MMMMLMLMMMMRMRMMMMLMLMMRMRMMLMML\n"+
-            "5 1 W\n"+
+            "MMMMLMLMMMMRMRMMMMLMLMMRMRMMLMML\n" +
+            "5 1 W\n" +
             "MLMMMMLMLMLMLMMRMRMMLMM";
 
         private static List<string> Pop(List<string> cmdList)
@@ -87,9 +87,9 @@ namespace _MarsRover
                 var plateau = new Plateau();
                 if (upperCoords != null)
                     plateau = new Plateau(Convert.ToInt32(upperCoords[0]),
-                            Convert.ToInt32(upperCoords[1]));
+                        Convert.ToInt32(upperCoords[1]));
                 var direction = new Direction();
-                var validator = new MoveValidator(direction, plateau);        
+                var validator = new MoveValidator(direction, plateau);
 
                 // cmdList minus first line(5 5) used for plateau setup divided by 2 lines per rover 
                 // >>> 1st line is rover 'start state'
@@ -112,42 +112,37 @@ namespace _MarsRover
                         var initX = Convert.ToInt32(initCommandLine[0]);
                         var initY = Convert.ToInt32(initCommandLine[1]);
                         var heading = direction.GetHeadingDegrees(initCommandLine[2]);
-                        if (validator.InitOrMovePosition(initX, initY))
+                        if (!validator.InitOrMovePosition(initX, initY))
                         {
-                            var rover = new Rover(initX, initY, heading, validator);
-                            // set the start position as explored too
-                            plateau.Grid[rover.X, rover.Y] = i;
-                            Console.WriteLine($"\nDeploying rover {i} on validated coordinates" +
-                                              $" {rover.X} {rover.Y} {direction.GetCardinalHeading(rover.H)} ");
-                            // after removing the rover init line from the cmdList 'stack', we have the "do stuff" line
-                            // for this initialized rover
-                            var doStuffCommandLine = PopLine(cmdList)?.ToCharArray();
-                            if (doStuffCommandLine != null)
-                            {
-                                rover.CmdCount = doStuffCommandLine.Length;
-                                rover.Number = i;
-                                foreach (var c in doStuffCommandLine)
-                                    if (c == 'L' || c == 'R')
-                                        rover.Turn(rover, c);
-                                    else
-                                        rover.Move(rover, rover.H, plateau.Grid);
-                            }
-
-                            // remove the commandLine from the cmdList 'stack' since we've used it
-                            cmdList = Pop(cmdList);
-                            Console.WriteLine($"The state of the plateau after rover {i} finished its commands\n");
-
-                            // Use this for collision detection
-                            plateau.ParkedRovers.Add(rover);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Rover {i} deployment at {initX} {initY} {direction.GetCardinalHeading(heading)} is invalid trying to deploy the next one");
-                            // remove the commandLine from the cmdList 'stack' since we've used it and it was invalid
+                            Console.WriteLine(
+                                $"\nRover {i} deployment at {initX} {initY} {direction.GetCardinalHeading(heading)} is invalid trying to deploy the next one");
+                            // remove the doStuffCommandLine from the cmdList 'stack' since we've tried to init the rover but it was invalid
                             cmdList = Pop(cmdList);
                             // and move on to the next rover without doing stuff
                             continue;
                         }
+
+                        var rover = new Rover(initX, initY, heading, validator);
+                        // set the start position as explored too
+                        plateau.Grid[rover.X, rover.Y] = i;
+                        Console.WriteLine($"\nDeploying rover {i} on validated coordinates" +
+                                          $" {rover.X} {rover.Y} {direction.GetCardinalHeading(rover.H)} ");
+                        // after removing the rover init line from the cmdList 'stack', we have the "do stuff" line
+                        // for this initialized rover
+                        var doStuffCommandLine = PopLine(cmdList)?.ToCharArray();
+                        if (doStuffCommandLine != null)
+                        {
+                            rover.CmdCount = doStuffCommandLine.Length;
+                            rover.Number = i;
+                            CommandProcessor(doStuffCommandLine, rover, plateau);
+                        }
+
+                        // remove the commandLine from the cmdList 'stack' since we've used it
+                        cmdList = Pop(cmdList);
+                        Console.WriteLine($"The state of the plateau after rover {i} finished its commands\n");
+
+                        // Use this for collision detection
+                        plateau.ParkedRovers.Add(rover);
                     }
 
                     // Print the rovers progress
@@ -171,6 +166,21 @@ namespace _MarsRover
             {
                 Console.WriteLine(ex);
             }
+        }
+
+        private static void CommandProcessor(char[] doStuffCommandLine, Rover rover, Plateau plateau)
+        {
+            foreach (var c in doStuffCommandLine)
+                switch (c)
+                {
+                    case 'L':
+                    case 'R':
+                        rover.Turn(rover, c);
+                        break;
+                    default:
+                        rover.Move(rover, rover.H, plateau.Grid);
+                        break;
+                }
         }
     }
 }
