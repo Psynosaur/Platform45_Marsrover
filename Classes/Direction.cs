@@ -1,4 +1,4 @@
-namespace _MarsRover
+namespace _MarsRover.Classes
 {
     public class Direction
     {

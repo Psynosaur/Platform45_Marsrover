@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _MarsRover.Classes;
 
 namespace _MarsRover
 {
@@ -20,7 +21,9 @@ namespace _MarsRover
             "6 6 W\n" +
             "MLMMMMLMLMLMLMMRMRMMLMMLL\n" +
             "9 0 N\n" +
-            "MMMMLMLMMMMRMRMMMMLMLMMRMRMMLMML";
+            "MMMMLMLMMMMRMRMMMMLMLMMRMRMMLMML\n"+
+            "5 1 W\n"+
+            "MLMMMMLMLMLMLMMRMRMMLMM";
 
         private static List<string> Pop(List<string> cmdList)
         {
@@ -139,7 +142,7 @@ namespace _MarsRover
                         }
                         else
                         {
-                            Console.WriteLine($"Rover {i} out of bounds, trying to deploy the next one");
+                            Console.WriteLine($"Rover {i} deployment at {initX} {initY} {direction.GetCardinalHeading(heading)} is invalid trying to deploy the next one");
                             // remove the commandLine from the cmdList 'stack' since we've used it and it was invalid
                             cmdList = Pop(cmdList);
                             // and move on to the next rover without doing stuff

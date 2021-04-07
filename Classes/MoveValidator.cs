@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
 
-namespace _MarsRover
+namespace _MarsRover.Classes
 {
     public class MoveValidator
     {
@@ -16,12 +15,19 @@ namespace _MarsRover
 
         public bool InitOrMovePosition(int x, int y)
         {
-            return x >= 0 && x < _plateau.LenX && y >= 0 && y < _plateau.LenY;
+            return x >= 0 && x < _plateau.LenX && y >= 0 && y < _plateau.LenY && !RoverCollides(x,y);
         }
 
-        public bool RoverMoveCollides(int x, int y)
+        public bool RoverCollides(int x, int y)
         {
-            var collider = _plateau.ParkedRovers.Any(o => o.X == x && o.Y == y);
+            var collider = false;
+            foreach (var o in _plateau.ParkedRovers)
+            {
+                if (o.X != x || o.Y != y) continue;
+                collider = true;
+                break;
+            }
+
             return collider;
         }
         // Collision and bounds check in same function :)
@@ -29,10 +35,17 @@ namespace _MarsRover
         {
             if (InitOrMovePosition(x, y))
             {
-                if (RoverMoveCollides(x, y))
+                if (RoverCollides(x, y))
                 {
                     r.Errors++;
-                    var collider = _plateau.ParkedRovers.FirstOrDefault(o => o.X == x && o.Y == y);
+                    Rover? collider = null;
+                    foreach (var o in _plateau.ParkedRovers)
+                    {
+                        if (o.X != x || o.Y != y) continue;
+                        collider = o;
+                        break;
+                    }
+
                     if (collider != null)
                         Console.WriteLine(
                             $"[ERROR] : Collision detected with rover {collider.Number}!!! skipping '{_direction.GetCardinalHeading(r.H)}' move command");
