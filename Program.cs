@@ -114,8 +114,10 @@ namespace _MarsRover
                         var heading = direction.GetHeadingDegrees(initCommandLine[2]);
                         if (!validator.InitOrMovePosition(initX, initY))
                         {
+                            var collider = validator.Collider(initX, initY);
                             Console.WriteLine(
-                                $"\nRover {i} deployment at {initX} {initY} {direction.GetCardinalHeading(heading)} is invalid trying to deploy the next one");
+                                $"\nRover {i} deployment at {initX} {initY} {direction.GetCardinalHeading(heading)} " +
+                                $"{(collider != null ? $"would collide with Rover {collider.Number}" : "is out of bounds")} trying the next one");
                             // remove the doStuffCommandLine from the cmdList 'stack' since we've tried to init the rover but it was invalid
                             cmdList = Pop(cmdList);
                             // and move on to the next rover without doing stuff
